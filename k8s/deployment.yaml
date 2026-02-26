@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: azure-springboot-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: azure-springboot-app
+  template:
+    metadata:
+      labels:
+        app: azure-springboot-app
+    spec:
+      containers:
+        - name: azure-springboot-container
+          image: azure-springboot-app:1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: db-secret

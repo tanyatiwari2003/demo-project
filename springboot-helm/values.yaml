@@ -1,0 +1,19 @@
+replicaCount: 2
+
+image:
+  repository: springboot-app
+  tag: "1.0"
+  pullPolicy: Never  
+
+service:
+  type: LoadBalancer
+  port: 80
+
+configMap:
+  name: app-config
+  dbHost: mysql
+
+secret:
+  name: app-secret
+  dbUsername: root
+  dbPassword: password
