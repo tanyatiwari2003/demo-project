@@ -1,4 +1,4 @@
-name: Build and Deploy to Kubernetes
+name: Build and Deploy to AKS
 
 on:
   push:
@@ -14,14 +14,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # 2. Set up JDK
+      # 2. Set up JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # 3. Build the JAR
+      # 3. Build the JAR with Maven
       - name: Build with Maven
         run: mvn clean package -DskipTests
 
@@ -32,7 +32,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # 5. Build and push Docker image
+      # 5. Build and Push Docker Image
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v4
         with:
@@ -42,23 +42,30 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/demo-project:latest
             ${{ secrets.DOCKER_USERNAME }}/demo-project:${{ github.sha }}
 
-      # 6. Set up kubectl
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
+      # 6. Login to Azure
+      - name: Azure Login
+        uses: azure/login@v1
         with:
-          version: 'latest'
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # 7. Configure kubeconfig
-      - name: Configure Kubeconfig
-        run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > $HOME/.kube/config
+      # 7. Set AKS kubectl context
+      - name: Set AKS Context
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: Tanya_Tiwari_RG
+          cluster-name: demo-aks
 
-      # 8. Update image tag in deployment and apply
-      - name: Deploy to Kubernetes
+      # 8. Deploy to AKS
+      - name: Deploy to AKS
         run: |
           sed -i 's|\$IMAGE_TAG|${{ github.sha }}|g' k8s/deployment.yaml
           sed -i 's|YOUR_DOCKERHUB_USERNAME|${{ secrets.DOCKER_USERNAME }}|g' k8s/deployment.yaml
           kubectl apply -f k8s/deployment.yaml
           kubectl apply -f k8s/service.yaml
-          kubectl rollout status deployment/demo-project
+          kubectl rollout status deployment/demo-project --timeout=120s
+
+      # 9. Get External IP of the service
+      - name: Get Service External IP
+        run: |
+          echo "Waiting for external IP..."
+          kubectl get svc demo-project-service
