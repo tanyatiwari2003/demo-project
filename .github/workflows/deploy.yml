@@ -21,11 +21,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 3. Build the JAR with Maven
+      # 3. Build JAR
       - name: Build with Maven
         run: mvn clean package -DskipTests
 
-      # 4. Log in to Docker Hub
+      # 4. Login to Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -48,7 +48,7 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # 7. Set AKS kubectl context
+      # 7. Set AKS context
       - name: Set AKS Context
         uses: azure/aks-set-context@v3
         with:
@@ -64,8 +64,6 @@ jobs:
           kubectl apply -f k8s/service.yaml
           kubectl rollout status deployment/demo-project --timeout=120s
 
-      # 9. Get External IP of the service
-      - name: Get Service External IP
-        run: |
-          echo "Waiting for external IP..."
-          kubectl get svc demo-project-service
+      # 9. Show deployed service
+      - name: Get Service IP
+        run: kubectl get svc demo-project-service
