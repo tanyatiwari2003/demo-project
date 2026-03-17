@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: demo-project
-          image: tanyatiwari2003/demo-project:$IMAGE_TAG
+          image: YOUR_DOCKERHUB_USERNAME/demo-project:$IMAGE_TAG
           ports:
             - containerPort: 8080
           resources:
