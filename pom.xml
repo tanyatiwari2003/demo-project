@@ -1,6 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.example</groupId>
@@ -8,6 +9,7 @@
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
+  <!-- Spring Boot parent -->
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
@@ -15,14 +17,16 @@
     <relativePath/>
   </parent>
 
+  <!-- Java version -->
   <properties>
     <java.version>17</java.version>
   </properties>
 
-  <!-- Manage platform/library versions here -->
+  <!-- Dependency management -->
   <dependencyManagement>
     <dependencies>
-      <!-- Testcontainers BOM (optional; only if you use Testcontainers) -->
+
+      <!-- Testcontainers BOM (optional) -->
       <dependency>
         <groupId>org.testcontainers</groupId>
         <artifactId>testcontainers-bom</artifactId>
@@ -31,7 +35,7 @@
         <scope>import</scope>
       </dependency>
 
-      <!-- Spring Cloud Azure BOM: manages versions for Azure Spring libs -->
+      <!-- Azure BOM (SAFE to keep, but not required now) -->
       <dependency>
         <groupId>com.azure.spring</groupId>
         <artifactId>spring-cloud-azure-dependencies</artifactId>
@@ -39,83 +43,74 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+
     </dependencies>
   </dependencyManagement>
 
+  <!-- Dependencies -->
   <dependencies>
-    <!-- Spring starters -->
+
+    <!-- Web -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
 
+    <!-- Thymeleaf -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-thymeleaf</artifactId>
     </dependency>
 
+    <!-- JPA -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
     </dependency>
 
-    <!-- Microsoft SQL Server JDBC driver (declare once; version managed by Spring Boot) -->
+    <!-- SQL Server -->
     <dependency>
       <groupId>com.microsoft.sqlserver</groupId>
       <artifactId>mssql-jdbc</artifactId>
     </dependency>
 
-    <!-- Azure Key Vault integration (version managed by Azure BOM above) -->
+    <!-- (IMPORTANT) No Key Vault dependency here -->
+    <!-- This avoids crash -->
 
-    <!-- If you use Testcontainers in tests, add libs without versions (managed by BOM)
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>mssqlserver</artifactId>
-      <scope>test</scope>
-    </dependency>
-    -->
   </dependencies>
 
+  <!-- Build plugins -->
   <build>
     <plugins>
 
-        <!-- Existing Spring Boot plugin -->
-        <plugin>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-maven-plugin</artifactId>
-        </plugin>
+      <!-- Spring Boot plugin -->
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
 
-        <!-- Add Jib Plugin -->
-        <plugin>
-            <groupId>com.google.cloud.tools</groupId>
-            <artifactId>jib-maven-plugin</artifactId>
-            <version>3.4.0</version>
-            <configuration>
-                <from>
-                    <!-- Base image -->
-                    <image>eclipse-temurin:17-jre-alpine</image>
-                </from>
-                <to>
-                    <!-- ACR image destination -->
-                    <image>${ACR_LOGIN_SERVER}/demo-project:${IMAGE_TAG}</image>
-                </to>
-                <container>
-                    <ports>
-                        <port>8080</port>
-                    </ports>
-                    <jvmFlags>
-                        <jvmFlag>-Xms256m</jvmFlag>
-                        <jvmFlag>-Xmx512m</jvmFlag>
-                    </jvmFlags>
-                </container>
-            </configuration>
-        </plugin>
+      <!-- Jib plugin (FINAL CLEAN VERSION) -->
+      <plugin>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>jib-maven-plugin</artifactId>
+        <version>3.4.0</version>
+        <configuration>
+          <from>
+            <image>eclipse-temurin:17-jre-alpine</image>
+          </from>
+          <container>
+            <ports>
+              <port>8080</port>
+            </ports>
+            <jvmFlags>
+              <jvmFlag>-Xms256m</jvmFlag>
+              <jvmFlag>-Xmx512m</jvmFlag>
+            </jvmFlags>
+          </container>
+        </configuration>
+      </plugin>
 
     </plugins>
   </build>
+
 </project>
