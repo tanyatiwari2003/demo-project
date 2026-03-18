@@ -1,0 +1,27 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Azure DB Demo</title>
+</head>
+<body>
+
+<h2>Add User</h2>
+<form action="/save" method="post">
+    Name: <input type="text" name="name" required><br><br>
+    Email: <input type="email" name="email" required><br><br>
+    <button type="submit">Save</button>
+</form>
+
+<hr>
+
+<h2>Users from Azure DB</h2>
+<ul>
+    <li th:each="u : ${users}">
+        <span th:text="${u.name}"></span> -
+        <span th:text="${u.email}"></span>
+    </li>
+</ul>
+
+</body>
+</html>
