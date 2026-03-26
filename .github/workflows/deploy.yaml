@@ -1,14 +1,11 @@
 name: Feature Branch - Build and Deploy via Jib to ACR
-
 on:
   push:
     branches:
       - 'feature/**'
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -37,7 +34,10 @@ jobs:
       - name: Azure Login
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Set AKS Context
         uses: azure/aks-set-context@v3
@@ -56,12 +56,9 @@ jobs:
       - name: Deploy to AKS
         run: |
           cp k8s/deployment.yaml k8s/deployment-temp.yaml
-
           sed -i "s|IMAGE_TAG|${{ steps.branch.outputs.branch }}-${{ github.sha }}|g" k8s/deployment-temp.yaml
-
           kubectl apply -f k8s/deployment-temp.yaml
           kubectl apply -f k8s/service.yaml
-
           kubectl rollout status deployment/demo-project --timeout=120s
 
       - name: Show Status
