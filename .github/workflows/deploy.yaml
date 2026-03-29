@@ -56,13 +56,21 @@ jobs:
             --docker-password=${{ secrets.ACR_PASSWORD }} \
             --dry-run=client -o yaml | kubectl apply -f -
 
+      # - name: Deploy to AKS
+      #   run: |
+      #     cp k8s/deployment.yaml k8s/deployment-temp.yaml
+      #     sed -i "s|IMAGE_TAG|${{ steps.branch.outputs.branch }}-${{ github.sha }}|g" k8s/deployment-temp.yaml
+      #     kubectl apply -f k8s/deployment-temp.yaml
+      #     kubectl apply -f k8s/service.yaml
+      #     kubectl rollout status deployment/demo-project --timeout=120s
+
       - name: Deploy to AKS
         run: |
           cp k8s/deployment.yaml k8s/deployment-temp.yaml
           sed -i "s|IMAGE_TAG|${{ steps.branch.outputs.branch }}-${{ github.sha }}|g" k8s/deployment-temp.yaml
           kubectl apply -f k8s/deployment-temp.yaml
           kubectl apply -f k8s/service.yaml
-          kubectl rollout status deployment/demo-project --timeout=120s
+          kubectl rollout status deployment/demo-project --timeout=300s
 
       - name: Show Status
         run: |
