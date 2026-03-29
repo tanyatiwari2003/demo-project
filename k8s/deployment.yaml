@@ -12,9 +12,11 @@ spec:
       labels:
         app: demo-project
     spec:
+      imagePullSecrets:
+        - name: acr-secret
       containers:
         - name: demo-project
-          image: ACR_LOGIN_SERVER/demo-project:IMAGE_TAG
+          image: demoprojectacr.azurecr.io/demo-project:IMAGE_TAG
           ports:
             - containerPort: 8080
           resources:
